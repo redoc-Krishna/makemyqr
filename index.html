@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Make My QR</title>
+    <link rel="icon" type="image/svg+xml" href="assets/make-my-qr-logo.svg">
+    <link rel="stylesheet" href="theme.css">
+</head>
+<body class="app-loading">
+    <div id="launchScreen" class="launch-screen" aria-live="polite">
+        <div class="launch-screen__ambient"></div>
+        <div class="launch-screen__ambient launch-screen__ambient--alt"></div>
+        <div class="launch-card">
+            <div class="launch-logo-shell" aria-hidden="true">
+                <span class="launch-logo-shell__halo"></span>
+                <span class="launch-logo-shell__ring"></span>
+                <img src="assets/make-my-qr-logo.svg" alt="" class="launch-logo">
+            </div>
+            <p class="launch-kicker">QR Studio</p>
+            <h2 class="launch-title">Make My QR</h2>
+            <p id="launchStatus" class="launch-status">Loading QR studio</p>
+            <div class="launch-progress" aria-hidden="true">
+                <span></span>
+            </div>
+        </div>
+    </div>
+
+    <main class="page-shell">
+        <section class="hero-panel">
+            <div class="hero-title-block">
+                <h1 class="brand-title">Make My QR</h1>
+            </div>
+        </section>
+
+        <section class="workspace-panel">
+            <div id="authView" class="view" hidden>
+                <div class="panel-header">
+                    <div>
+                        <p class="section-tag">Access</p>
+                        <h2>Welcome back</h2>
+                        <p class="panel-note">Log in to save your profile details and QR history.</p>
+                    </div>
+                    <button type="button" id="returnToGeneratorBtn" class="ghost-btn auth-back-btn">Back to QR maker</button>
+                </div>
+
+                <div class="auth-switch" aria-label="Authentication mode">
+                    <button type="button" id="loginTabBtn" class="switch-btn is-active">Login</button>
+                    <button type="button" id="signupTabBtn" class="switch-btn">Sign up</button>
+                </div>
+
+                <form id="loginForm" class="auth-form">
+                    <label class="field-label" for="loginUsername">Username</label>
+                    <input id="loginUsername" class="input-field" type="text" autocomplete="username" required>
+
+                    <label class="field-label" for="loginPassword">Password</label>
+                    <div class="password-field">
+                        <input id="loginPassword" class="input-field password-input" type="password" autocomplete="current-password" required>
+                        <button type="button" class="password-toggle" data-toggle-password="loginPassword" aria-label="Show password">&#128065;</button>
+                    </div>
+
+                    <p id="loginMessage" class="form-message" hidden></p>
+
+                    <div class="auth-actions">
+                        <button type="submit" class="primary-btn">Login</button>
+                        <button type="button" id="showSignupBtn" class="ghost-btn">New user? Sign up</button>
+                    </div>
+                </form>
+
+                <form id="signupForm" class="auth-form" hidden>
+                    <label class="field-label" for="signupUsername">New Username</label>
+                    <input id="signupUsername" class="input-field" type="text" autocomplete="username" required>
+
+                    <label class="field-label" for="signupPassword">New Password</label>
+                    <div class="password-field">
+                        <input id="signupPassword" class="input-field password-input" type="password" autocomplete="new-password" required>
+                        <button type="button" class="password-toggle" data-toggle-password="signupPassword" aria-label="Show password">&#128065;</button>
+                    </div>
+
+                    <label class="field-label" for="signupPasswordConfirm">Confirm Password</label>
+                    <input id="signupPasswordConfirm" class="input-field" type="password" autocomplete="new-password" required>
+
+                    <p id="signupMessage" class="form-message" hidden></p>
+
+                    <div class="auth-actions">
+                        <button type="submit" class="primary-btn">Create Account</button>
+                        <button type="button" id="showLoginBtn" class="ghost-btn">Back to login</button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="generatorView" class="view">
+                <div class="panel-header panel-header--app">
+                    <div>
+                        <h2>QR generator</h2>
+                        <p class="welcome-copy"><span id="welcomeName">Hello Guest</span></p>
+                    </div>
+                    <div class="header-actions">
+                        <button type="button" id="guestLoginBtn" class="ghost-btn guest-login-btn">Log in</button>
+
+                        <div id="profileCard" class="profile-card" hidden>
+                            <div class="profile-avatar">
+                                <img id="profileAvatarImage" class="profile-avatar__image" alt="Profile picture" hidden>
+                                <span id="profileAvatarFallback" class="profile-avatar__fallback">G</span>
+                            </div>
+                            <div class="profile-meta">
+                                <p id="profileDisplayName" class="profile-name">Guest</p>
+                                <p id="profileUsername" class="profile-username">@guest</p>
+                            </div>
+                        </div>
+
+                        <div class="menu-wrap">
+                            <button type="button" id="moreOptionsBtn" class="icon-btn" aria-label="More options" aria-expanded="false" aria-controls="accountMenu">
+                                <span class="menu-dot"></span>
+                                <span class="menu-dot"></span>
+                                <span class="menu-dot"></span>
+                            </button>
+                            <div id="accountMenu" class="account-menu" hidden>
+                                <button type="button" id="openAuthFromMenuBtn" class="menu-item">Log in</button>
+                                <button type="button" id="openAccountDetailsBtn" class="menu-item" hidden>Account Details</button>
+                                <button type="button" id="openResetPasswordBtn" class="menu-item" hidden>Reset password</button>
+                                <button type="button" id="openDeleteAccountBtn" class="menu-item menu-item--danger" hidden>Delete account</button>
+                                <button type="button" id="logoutBtn" class="menu-item" hidden>Log out</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <form id="qrForm" class="generator-form">
+                    <label class="field-label" for="qrText">Website Link</label>
+                    <input
+                        id="qrText"
+                        class="input-field"
+                        type="text"
+                        inputmode="url"
+                        placeholder="example.com"
+                        autocomplete="url"
+                        required
+                    >
+
+                    <div class="action-row">
+                        <button type="submit" class="primary-btn">Generate QR</button>
+                        <a id="downloadBtn" class="secondary-btn" href="#" download="qr-code.png" hidden>Download PNG</a>
+                        <a id="openLink" class="ghost-link" href="#" target="_blank" rel="noreferrer" hidden>Open link</a>
+                    </div>
+                </form>
+
+                <p id="statusMessage" class="status-message">Enter a website link to generate your QR code.</p>
+
+                <div class="dashboard-grid">
+                    <section class="content-panel">
+                        <div class="content-panel__header">
+                            <div>
+                                <p class="section-tag">Preview</p>
+                                <h3>Your latest QR</h3>
+                            </div>
+                        </div>
+                        <div id="qrBox" class="qr-box" aria-live="polite">
+                            <p class="empty-state">Your QR preview will appear here after you generate one.</p>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </section>
+
+        <section id="historySection" class="content-panel history-section">
+            <div class="content-panel__header">
+                <div>
+                    <p class="section-tag">History</p>
+                    <h3>Saved History</h3>
+                </div>
+                <div class="history-header-actions">
+                    <span id="historyCount" class="history-count">Guest mode</span>
+                    <button type="button" id="clearHistoryBtn" class="ghost-btn history-clear-btn" hidden>Clear all history</button>
+                </div>
+            </div>
+            <div id="historyList" class="history-list">
+                <div class="guest-history-card">
+                    <p class="guest-history-copy">
+                        History is saved only after you
+                        <a href="#login" class="history-login-link" data-action="open-auth">log in</a>.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+
+        <section id="guideSection" class="content-panel guide-section">
+            <div class="content-panel__header guide-section__header">
+                <div>
+                    <p class="section-tag">Walkthrough</p>
+                    <h3>See the full Make My QR flow</h3>
+                </div>
+            </div>
+
+            <section id="loginStepsPanel" class="steps-panel" aria-label="Login steps" hidden>
+                <div class="guide-list">
+                    <article class="guide-row">
+                        <div class="guide-copy">
+                            <span class="guide-step-badge">Step 1</span>
+                            <h4 class="guide-title">Login</h4>
+                            <p class="guide-text">Enter your username to begin the login flow.</p>
+                        </div>
+                        <div class="guide-media">
+                            <img src="assets/screenshots/login-1.png" alt="Illustration of the login screen" class="guide-image">
+                        </div>
+                    </article>
+
+                    <article class="guide-row guide-row--reverse">
+                        <div class="guide-copy">
+                            <span class="guide-step-badge">Step 2</span>
+                            <h4 class="guide-title">Password and Continue</h4>
+                            <p class="guide-text">Add your password and check it if needed with the eye icon and Tap Login to go back into your QR workspace.</p>
+                        </div>
+                        <div class="guide-media">
+                            <img src="assets/screenshots/login-2.png" alt="Illustration of the sign up screen" class="guide-image">
+                        </div>
+                    </article>
+                </div>
+            </section>
+
+            <section id="signupStepsPanel" class="steps-panel" aria-label="Sign up steps" hidden>
+                <div class="guide-list">
+                    <article class="guide-row">
+                        <div class="guide-copy">
+                            <span class="guide-step-badge">Step 1</span>
+                            <h4 class="guide-title">Create Username</h4>
+                            <p class="guide-text">Choose a unique username for your new account.</p>
+                        </div>
+                        <div class="guide-media">
+                            <img src="assets/screenshots/signup-1.png" alt="Illustration of the login screen" class="guide-image">
+                        </div>
+                    </article>
+
+                    <article class="guide-row guide-row--reverse">
+                        <div class="guide-copy">
+                            <span class="guide-step-badge">Step 2</span>
+                            <h4 class="guide-title">Set password</h4>
+                            <p class="guide-text">Pick a password and unhide it with the eye icon.</p>
+                        </div>
+                        <div class="guide-media">
+                            <img src="assets/screenshots/signup-2.png" alt="Illustration of the sign up screen" class="guide-image">
+                        </div>
+                    </article>
+                </div>
+            </section>
+
+            <section id="generatorStepsPanel" class="steps-panel steps-panel--generator" aria-label="QR generator steps" hidden>
+                <div class="guide-list">
+                    <article class="guide-row">
+                        <div class="guide-copy">
+                            <span class="guide-step-badge">Step 1</span>
+                            <h4 class="guide-title">Paste your link</h4>
+                            <p class="guide-text">Add the website URL you want to turn into a QR code.</p>
+                        </div>
+                        <div class="guide-media">
+                            <img src="assets/screenshots/generator-1.png" alt="Illustration of the login screen" class="guide-image">
+                        </div>
+                    </article>
+
+                    <article class="guide-row guide-row--reverse">
+                        <div class="guide-copy">
+                            <span class="guide-step-badge">Step 2</span>
+                            <h4 class="guide-title">Generate QR and Use your result</h4>
+                            <p class="guide-text">Generate the branded QR code to preview it, download the PNG file, or immediately access the saved website link.</p>
+                        </div>
+                        <div class="guide-media">
+                            <img src="assets/screenshots/generator-2.png" alt="Illustration of the sign up screen" class="guide-image">
+                        </div>
+                    </article>
+                </div>
+            </section>  
+        </section>
+
+    </main>
+
+    <div id="modalBackdrop" class="modal-backdrop" hidden></div>
+
+    <section id="accountDetailsModal" class="modal-card" hidden aria-labelledby="accountDetailsTitle">
+        <div class="modal-header">
+            <div>
+                <p class="section-tag">Account</p>
+                <h3 id="accountDetailsTitle">Account Details</h3>
+            </div>
+            <button type="button" id="closeAccountDetailsBtn" class="icon-close" aria-label="Close account details dialog">x</button>
+        </div>
+
+        <form id="accountDetailsForm" class="auth-form modal-form">
+            <div class="account-preview">
+                <div class="profile-avatar profile-avatar--large">
+                    <img id="accountPreviewImage" class="profile-avatar__image" alt="Profile picture preview" hidden>
+                    <span id="accountPreviewFallback" class="profile-avatar__fallback">G</span>
+                </div>
+                <div class="account-preview__copy">
+                    <p id="accountPreviewName" class="profile-name">Guest</p>
+                    <p id="accountPreviewHandle" class="profile-username">@guest</p>
+                </div>
+            </div>
+
+            <label class="field-label" for="accountNameInput">Name</label>
+            <input id="accountNameInput" class="input-field" type="text" autocomplete="name" placeholder="Enter your display name">
+
+            <label class="field-label" for="profilePictureInput">Profile picture</label>
+            <input id="profilePictureInput" class="profile-picture-input" type="file" accept="image/*">
+            <div id="picturePicker" class="picture-picker" role="button" tabindex="0" aria-describedby="picturePickerHint profilePictureMeta">
+                <button type="button" id="chooseProfilePictureBtn" class="ghost-btn picture-picker__button">Choose profile picture</button>
+                <button type="button" id="removeProfilePictureBtn" class="ghost-btn picture-picker__remove" hidden>Remove picture</button>
+                <p id="picturePickerHint" class="picture-picker__hint">Drag and drop an image here, or choose one from your device.</p>
+                <p id="profilePictureMeta" class="picture-picker__meta">No picture selected</p>
+            </div>
+
+            <p id="accountDetailsMessage" class="form-message" hidden></p>
+
+            <div class="modal-actions">
+                <button type="button" id="saveAccountDetailsBtn" class="primary-btn">Save Details</button>
+                <button type="button" id="cancelAccountDetailsBtn" class="ghost-btn">Cancel</button>
+            </div>
+        </form>
+    </section>
+
+    <section id="resetPasswordModal" class="modal-card" hidden aria-labelledby="resetPasswordTitle">
+        <div class="modal-header">
+            <div>
+                <p class="section-tag">Account</p>
+                <h3 id="resetPasswordTitle">Reset password</h3>
+            </div>
+            <button type="button" id="closeResetPasswordBtn" class="icon-close" aria-label="Close reset password dialog">x</button>
+        </div>
+
+        <form id="resetPasswordForm" class="auth-form modal-form">
+            <label class="field-label" for="oldPassword">Previous Password</label>
+            <div class="password-field">
+                <input id="oldPassword" class="input-field password-input" type="password" autocomplete="current-password" required>
+                <button type="button" class="password-toggle" data-toggle-password="oldPassword" aria-label="Show password">&#128065;</button>
+            </div>
+
+            <label class="field-label" for="newPassword">New Password</label>
+            <div class="password-field">
+                <input id="newPassword" class="input-field password-input" type="password" autocomplete="new-password" required>
+                <button type="button" class="password-toggle" data-toggle-password="newPassword" aria-label="Show password">&#128065;</button>
+            </div>
+
+            <label class="field-label" for="confirmNewPassword">Confirm New Password</label>
+            <input id="confirmNewPassword" class="input-field" type="password" autocomplete="new-password" required>
+
+            <p id="resetPasswordMessage" class="form-message" hidden></p>
+
+            <div class="modal-actions">
+                <button type="submit" class="primary-btn">Save Password</button>
+                <button type="button" id="cancelResetPasswordBtn" class="ghost-btn">Cancel</button>
+            </div>
+        </form>
+    </section>
+
+    <section id="deleteAccountModal" class="modal-card" hidden aria-labelledby="deleteAccountTitle">
+        <div class="modal-header">
+            <div>
+                <p class="section-tag">Danger Zone</p>
+                <h3 id="deleteAccountTitle">Delete account</h3>
+            </div>
+            <button type="button" id="closeDeleteAccountBtn" class="icon-close" aria-label="Close delete account dialog">x</button>
+        </div>
+
+        <form id="deleteAccountForm" class="auth-form modal-form">
+            <p class="modal-copy">Enter your password to permanently delete your account and its saved QR history.</p>
+
+            <label class="field-label" for="deletePassword">Password</label>
+            <div class="password-field">
+                <input id="deletePassword" class="input-field password-input" type="password" autocomplete="current-password" required>
+                <button type="button" class="password-toggle" data-toggle-password="deletePassword" aria-label="Show password">&#128065;</button>
+            </div>
+
+            <p id="deleteAccountMessage" class="form-message" hidden></p>
+
+            <div class="modal-actions">
+                <button type="submit" id="confirmDeleteAccountBtn" class="danger-btn">Confirm Deletion</button>
+                <button type="button" id="cancelDeleteAccountBtn" class="ghost-btn">Cancel</button>
+            </div>
+        </form>
+    </section>
+
+    <footer class="page-footer">
+        <p class="footer-description">Create, save, and revisit your QR codes whenever you need them.</p>
+        <p class="footer-copy">&copy; 2026 Make My QR. All rights reserved.</p>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="secure-app.js"></script>
+</body>
+</html>

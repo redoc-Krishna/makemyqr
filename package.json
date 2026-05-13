@@ -1,0 +1,9 @@
+{
+  "name": "make-my-qr-secure-sync-2-1",
+  "version": "2.1.0",
+  "private": true,
+  "description": "Make My QR sync build with secure account storage and per-site QR logos",
+  "scripts": {
+    "start": "node server.js"
+  }
+}
